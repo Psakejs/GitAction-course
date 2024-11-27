@@ -29,6 +29,5 @@ jobs:
           php-version: '8.2'  # Specify PHP version
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, libxml
           coverage: none
-
       - name: Run PHP script
         run: php prueba.php

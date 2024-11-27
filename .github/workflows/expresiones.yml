@@ -1,0 +1,50 @@
+name: expresiones
+run-name: expresiones-example
+on:
+  workflow_dispatch:
+    inputs:
+      username:
+        description: 'Username'
+        required: true
+        default: John Doe
+        type: string
+      password:
+        description: 'Password'
+        required: true
+        type: string
+jobs:
+  auth-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check credentials
+        id: auth
+        run: |
+          if [[ "${{ inputs.username }}" == "Psakejs" && "${{ inputs.password }}" == "1s2" ]]; then
+            echo "auth_status=success" >> $GITHUB_OUTPUT
+          else
+            echo "auth_status=failed" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Success message
+        if: steps.auth.outputs.auth_status == 'success'
+        run: echo "Welcome ${{ inputs.username }}, you have logged in successfully"
+      
+      - name: Checkout repository
+        if: steps.auth.outputs.auth_status == 'success'
+        uses: actions/checkout@v4
+  
+      - name: Setup PHP
+        if: steps.auth.outputs.auth_status == 'success'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, dom, filter, gd, json, libxml
+          coverage: none
+
+      - name: Run PHP script
+        if: steps.auth.outputs.auth_status == 'success'
+        run: php prueba.php
+
+      - name: Failed login message
+        if: steps.auth.outputs.auth_status == 'failed'
+        run: echo "Invalid username or password for user ${{ inputs.username }}"
